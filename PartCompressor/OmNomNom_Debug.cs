@@ -1,35 +1,11 @@
-﻿using System.Linq;
+﻿#if DEBUG
+using System.Linq;
 
 namespace PartCompressor
 {
     public partial class OmNomNom
     {
-        protected void SetFakeMass(double mass)
-        {
-            var res = this.part.Resources.Get("__CompressedPartsMassEquivalent");
-
-            if (res is null)
-            {
-                print("Creating resource for FakeMass");
-                //this.part.partInfo =  new AvailablePart(this.part.partInfo);
-                var resourceConfig = new ConfigNode("RESOURCE");
-
-                resourceConfig.AddValue("name", "__CompressedPartsMassEquivalent");
-                resourceConfig.AddValue("amount", mass);
-                resourceConfig.AddValue("isVisible", true);
-
-                res = this.part.AddResource(resourceConfig);
-            }
-            else
-            {
-                print("Reusing existing resource for FakeMass");
-                res.amount = mass;
-            }
-        }
-        protected void RemFakeMass()
-        {
-            this.part.RemoveResource("__CompressedPartsMassEquivalent");
-        }
+        private Vessel lastDetached;
 
         [KSPEvent(guiActive = true, guiName = "AddFakeMass", active = true, guiActiveEditor = true)]
         public void AddFakeMass()
@@ -169,3 +145,4 @@ namespace PartCompressor
         }
     }
 }
+#endif

@@ -73,12 +73,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Run.bat">
+    <None Include="Renamer.cfg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>Run.bat</PostBuildEvent>
+    <PostBuildEvent>START /wait taskkill /F /IM KSP_x64.exe
+copy /Y "$(ProjectDir)$(OutDir)Renamer.dll" "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\Test\Renamer.dll"
+copy /Y "$(ProjectDir)$(OutDir)Renamer.cfg" "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\Test\Renamer.cfg"
+powershell start-process "\"C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64.exe\""
+</PostBuildEvent>
   </PropertyGroup>
 </Project>

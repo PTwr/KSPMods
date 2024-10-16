@@ -17,9 +17,7 @@ namespace PartCompressor
         [KSPField(isPersistant = true, guiActive = true)]
         UnityEngine.Quaternion originalPartRotation;
         //[KSPField(isPersistant = true)]
-        ConfigNode vesselNode;dd
-
-        Vessel lastDetached;
+        ConfigNode vesselNode;
 
         public override void OnSave(ConfigNode node)
         {

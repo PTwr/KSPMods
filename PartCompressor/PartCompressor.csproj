@@ -69,16 +69,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="OmNomNom.cs" />
+    <Compile Include="OmNomNom_Helpers.cs" />
     <Compile Include="OmNomNom_Debug.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Run.bat">
+    <None Include="PartCompressor.cfg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>Run.bat</PostBuildEvent>
+    <PostBuildEvent>START /wait taskkill /F /IM KSP_x64.exe
+copy /Y "$(ProjectDir)$(OutDir)PartCompressor.dll" "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\Test\PartCompressor.dll"
+copy /Y "$(ProjectDir)$(OutDir)PartCompressor.cfg" "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\Test\PartCompressor.cfg"
+powershell start-process "\"C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64.exe\""
+</PostBuildEvent>
   </PropertyGroup>
 </Project>
