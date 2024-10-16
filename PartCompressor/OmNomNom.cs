@@ -10,39 +10,54 @@ namespace PartCompressor
 {
     public partial class OmNomNom : PartModule
     {
+        const string CompressedSubVesselsConfigNodeName = "CompressedSubVesselsConfigNode";
+
         [KSPField(isPersistant = true, guiActive = true)]
         UnityEngine.Vector3 originalPosition;
         [KSPField(isPersistant = true, guiActive = true)]
         UnityEngine.Quaternion originalRotation;
         [KSPField(isPersistant = true, guiActive = true)]
         UnityEngine.Quaternion originalPartRotation;
-        //[KSPField(isPersistant = true)]
-        ConfigNode vesselNode;
+
+        List<ConfigNode> vesselNodes = new List<ConfigNode>();
 
         public override void OnSave(ConfigNode node)
         {
-            if (vesselNode != null)
-                node.SetNode("omnomnom", vesselNode, true);
-            else if (node.HasNode("omnomnom"))
-                node.RemoveNode("omnomnom");
+            if (vesselNodes.Any())
+            {
+                var config = new ConfigNode(CompressedSubVesselsConfigNodeName);
+
+                int n = 0;
+                foreach (var vesselNode in vesselNodes)
+                {
+                    config.AddNode($"Compressed Vessel #{n++}", vesselNode);
+                }
+
+                node.SetNode(CompressedSubVesselsConfigNodeName, config, true);
+            }
+            else if (node.HasNode(CompressedSubVesselsConfigNodeName))
+            {
+                node.RemoveNode(CompressedSubVesselsConfigNodeName);
+            }
+
             base.OnSave(node);
         }
         public override void OnLoad(ConfigNode node)
         {
-            if (node.HasNode("omnomnom"))
-                vesselNode = node.GetNode("omnomnom");
-            base.OnLoad(node);
-        }
+            if (node.HasNode(CompressedSubVesselsConfigNodeName))
+            {
+                var config = node.GetNode(CompressedSubVesselsConfigNodeName);
 
-        [KSPEvent(guiActive = true, guiName = "Compress first child V2", active = true, guiActiveEditor = true)]
-        public void CompressV2()
-        {
-            var firstChild = this.part.children.FirstOrDefault();
+                vesselNodes = config.GetNodes().ToList();
+            }
+            base.OnLoad(node);
         }
 
         [KSPEvent(guiActive = true, guiName = "Compress first child", active = true, guiActiveEditor = true)]
         public void Compress()
         {
+            FlightDriver.SetPause(true);
+
             GamePersistence.SaveGame(HighLogic.CurrentGame,
                 "__BeforeCompress",
                 HighLogic.SaveFolder,
@@ -78,7 +93,7 @@ namespace PartCompressor
 
             ///////////////////////
 
-            vesselNode = new ConfigNode("VESSEL");
+            var vesselNode = new ConfigNode("VESSEL");
             ProtoVessel pVessel = newVessel.BackupVessel();
             pVessel.Save(vesselNode);
 
@@ -94,7 +109,7 @@ namespace PartCompressor
             print(newVessel.RevealMass());
             print(newVessel.totalMass);
 
-            SetFakeMass(newVessel.totalMass);
+            ChangeFakeMass(newVessel.totalMass);
 
             print("removing packed parts");
             newVessel.Die();
@@ -102,17 +117,23 @@ namespace PartCompressor
             print("Vessel mass after FakeMass");
             print(this.vessel.totalMass);
             vessel.GoOffRails();
+
+            FlightDriver.SetPause(false);
         }
 
         [KSPEvent(guiActive = true, guiName = "Decompress first child", active = true, guiActiveEditor = true)]
         public void Decompress()
         {
+            FlightDriver.SetPause(true);
+
             GamePersistence.SaveGame(HighLogic.CurrentGame,
                 "__BeforeDecompress",
                 HighLogic.SaveFolder,
                 SaveMode.OVERWRITE);
 
-            if (vesselNode == null) return;
+            if (!vesselNodes.Any()) return;
+
+            var vesselNode = vesselNodes.First();
 
             vessel.GoOnRails();
 
@@ -123,7 +144,7 @@ namespace PartCompressor
 
             print("aaa");
             ProtoVessel addedVessel = HighLogic.CurrentGame.AddVessel(vesselNode);
-            lastDetached = addedVessel.vesselRef;
+            var lastDetached = addedVessel.vesselRef;
             print("aaa");
 
             lastDetached.Load();
@@ -144,7 +165,7 @@ namespace PartCompressor
             print(lastDetached.rootPart);
             print(lastDetached.rootPart.partInfo.title);
 
-
+            var detachedMass = lastDetached.totalMass;
 
             var partsToAttach = lastDetached.Parts.ToList();
 
@@ -163,9 +184,19 @@ namespace PartCompressor
                 part.UpdateAutoStrut();
             }
 
-            RemFakeMass();
+            ChangeFakeMass(-detachedMass);
 
             vessel.GoOffRails();
+
+            vesselNodes.Remove(vesselNode);
+
+            if (!vesselNodes.Any())
+            {
+                //cleanup whats left after floating point innacuracy from +/-
+                RemFakeMass();
+            }
+
+            FlightDriver.SetPause(false);
         }
     }
 }

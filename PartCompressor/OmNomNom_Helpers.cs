@@ -5,7 +5,7 @@ namespace PartCompressor
 {
     public partial class OmNomNom
     {
-        protected void SetFakeMass(double mass)
+        protected void ChangeFakeMass(double mass)
         {
             var res = this.part.Resources.Get("__CompressedPartsMassEquivalent");
 
@@ -23,7 +23,7 @@ namespace PartCompressor
             else
             {
                 print("Reusing existing resource for FakeMass");
-                res.amount = mass;
+                res.amount = +mass;
             }
         }
         protected void RemFakeMass()

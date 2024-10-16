@@ -39,6 +39,10 @@
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="ClickThroughBlocker">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\000_ClickThroughBlocker\Plugins\ClickThroughBlocker.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -72,8 +76,12 @@
     <Compile Include="OmNomNom_Helpers.cs" />
     <Compile Include="OmNomNom_Debug.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VesselProtector.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="PartCompressor_Debug.cfg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="PartCompressor.cfg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -83,6 +91,7 @@
     <PostBuildEvent>START /wait taskkill /F /IM KSP_x64.exe
 copy /Y "$(ProjectDir)$(OutDir)PartCompressor.dll" "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\Test\PartCompressor.dll"
 copy /Y "$(ProjectDir)$(OutDir)PartCompressor.cfg" "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\Test\PartCompressor.cfg"
+copy /Y "$(ProjectDir)$(OutDir)PartCompressor_Debug.cfg" "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\Test\PartCompressor_Debug.cfg"
 powershell start-process "\"C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64.exe\""
 </PostBuildEvent>
   </PropertyGroup>
