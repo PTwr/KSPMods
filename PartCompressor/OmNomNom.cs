@@ -53,6 +53,39 @@ namespace PartCompressor
             base.OnLoad(node);
         }
 
+        [KSPEvent(guiActive = true, guiName = "Compress2 first child", active = true, guiActiveEditor = true)]
+        public void Compress2()
+        {
+            using (vessel.Protect(true, "__BeforeCompress"))
+            {
+                var firstChild = this.part.children.FirstOrDefault();
+
+                if (firstChild is null)
+                {
+                    print("No child!");
+                    vessel.GoOffRails();
+                    return;
+                }
+
+                firstChild.decouple();
+
+                var newVessel = firstChild.vessel;
+
+                originalPosition = newVessel.transform.position;
+                originalRotation = this.vessel.transform.rotation;
+
+                var vesselNode = new ConfigNode("VESSEL");
+                ProtoVessel pVessel = newVessel.BackupVessel();
+                pVessel.Save(vesselNode);
+
+                vesselNodes.Add(vesselNode);
+
+                ChangeFakeMass(newVessel.totalMass);
+
+                newVessel.Die();
+            }
+        }
+
         [KSPEvent(guiActive = true, guiName = "Compress first child", active = true, guiActiveEditor = true)]
         public void Compress()
         {
@@ -121,6 +154,49 @@ namespace PartCompressor
             FlightDriver.SetPause(false);
         }
 
+        [KSPEvent(guiActive = true, guiName = "Decompress2 first child", active = true, guiActiveEditor = true)]
+        public void Decompress2()
+        {
+            using (vessel.Protect(true, "__BeforeDecompress"))
+            using (vessel.TemporarilyRotate(originalRotation))
+            {
+                if (!vesselNodes.Any()) return;
+                var vesselNode = vesselNodes.First();
+
+
+                ProtoVessel addedVessel = HighLogic.CurrentGame.AddVessel(vesselNode);
+                var lastDetached = addedVessel.vesselRef;
+
+                lastDetached.Load();
+                lastDetached.GoOnRails();
+
+                lastDetached.SetPosition(originalPosition);
+
+
+                var detachedMass = lastDetached.totalMass;
+
+                var partsToAttach = lastDetached.Parts.ToList();
+
+                lastDetached.rootPart.Couple(this.part);
+
+                foreach (var part in partsToAttach)
+                {
+                    part.AllowAutoStruts();
+                    part.autoStrutMode = Part.AutoStrutMode.Root;
+                    part.UpdateAutoStrut();
+                }
+
+                ChangeFakeMass(-detachedMass);
+
+                vesselNodes.Remove(vesselNode);
+
+                if (!vesselNodes.Any())
+                {
+                    //cleanup whats left after floating point innacuracy from +/-
+                    RemFakeMass();
+                }
+            }
+        }
         [KSPEvent(guiActive = true, guiName = "Decompress first child", active = true, guiActiveEditor = true)]
         public void Decompress()
         {

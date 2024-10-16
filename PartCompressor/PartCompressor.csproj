@@ -72,11 +72,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\ExtensionMethods.cs" />
+    <Compile Include="Helpers\VesselTemporaryRotation.cs" />
     <Compile Include="OmNomNom.cs" />
     <Compile Include="OmNomNom_Helpers.cs" />
     <Compile Include="OmNomNom_Debug.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VesselProtector.cs" />
+    <Compile Include="Helpers\VesselProtector.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PartCompressor_Debug.cfg">

@@ -54,7 +54,16 @@ namespace PartCompressor
             {
                 res.amount += 1000;
             }
-            
+
+        }
+        [KSPEvent(guiActive = true, guiName = "VesselPosRot", active = true, guiActiveEditor = true)]
+        public void VesselPosRot()
+        {
+
+            print("---------------------------");
+            print(this.vessel.transform.position);
+            print(this.vessel.transform.rotation);
+            print("---------------------------");
         }
 
         [KSPEvent(guiActive = true, guiName = "PosRotInfo", active = true, guiActiveEditor = true)]

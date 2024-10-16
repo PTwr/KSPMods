@@ -12,6 +12,9 @@ namespace PartCompressor
 
         public VesselProtector(Vessel vessel, bool autosave = true, string autosaveName = "__autosave")
         {
+            ScreenMessages.PostScreenMessage("Protecting vessel from physics!!!");
+            FlightDriver.SetPause(true, true);
+
             if (autosave)
             {
                 GamePersistence.SaveGame(HighLogic.CurrentGame,
@@ -21,9 +24,6 @@ namespace PartCompressor
             }
 
             this.vessel = vessel;
-
-            ScreenMessages.PostScreenMessage("Protecting vessel from physics!!!");
-            FlightDriver.SetPause(true, true);
 
             vessel.GoOnRails();
         }
