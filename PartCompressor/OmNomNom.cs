@@ -108,7 +108,8 @@ namespace PartCompressor
                 lastDetached.GoOnRails();
 
                 lastDetached.SetPosition(originalPosition);
-
+                //required if orbit eccentricity changes since compression
+                lastDetached.SetRotation(originalRotation);
 
                 var detachedMass = lastDetached.GetTotalMass();
 

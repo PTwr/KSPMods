@@ -93,9 +93,9 @@
   <PropertyGroup>
     <PostBuildEvent>powershell stop-process -name "KSP_x64"; wait-process -name "KSP_x64"
 powershell stop-process -name "UnityCrashHandler64"; wait-process -name "UnityCrashHandler64"
-copy /Y "$(ProjectDir)$(OutDir)PartCompressor.dll" "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\Test\PartCompressor.dll"
-copy /Y "$(ProjectDir)$(OutDir)PartCompressor.cfg" "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\Test\PartCompressor.cfg"
-copy /Y "$(ProjectDir)$(OutDir)PartCompressor_Debug.cfg" "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\Test\PartCompressor_Debug.cfg"
+copy /Y "$(ProjectDir)$(OutDir)PartCompressor.dll" "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\KSPPartCountOptimizers\PartCompressor.dll"
+copy /Y "$(ProjectDir)$(OutDir)PartCompressor.cfg" "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\KSPPartCountOptimizers\PartCompressor.cfg"
+copy /Y "$(ProjectDir)$(OutDir)PartCompressor_Debug.cfg" "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\KSPPartCountOptimizers\PartCompressor_Debug.cfg"
 powershell start-process "\"C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64.exe\""
 </PostBuildEvent>
   </PropertyGroup>
