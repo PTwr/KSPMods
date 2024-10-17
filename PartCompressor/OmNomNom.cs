@@ -72,6 +72,7 @@ namespace PartCompressor
                 var newVessel = firstChild.vessel;
 
                 originalPosition = newVessel.transform.position;
+                originalPosition += this.vessel.transform.position; //on ground current vessel is not at [0,0,0]!!!
                 originalRotation = this.vessel.transform.rotation;
 
                 var vesselNode = new ConfigNode("VESSEL");
