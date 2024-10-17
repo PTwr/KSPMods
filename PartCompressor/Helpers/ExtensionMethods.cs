@@ -12,5 +12,13 @@ namespace PartCompressor
         {
             return new VesselTemporaryRotation(vessel, rotation);
         }
+        public static VesselTemporaryPosition TemporarilyPosition(this Vessel vessel, Vector3 position)
+        {
+            return new VesselTemporaryPosition(vessel, position);
+        }
+        public static VesselTemporaryPosition TemporarilyPositionAtZero(this Vessel vessel)
+        {
+            return new VesselTemporaryPosition(vessel, Vector3.zero);
+        }
     }
 }

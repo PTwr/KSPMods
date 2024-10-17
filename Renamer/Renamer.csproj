@@ -79,7 +79,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>START /wait taskkill /F /IM KSP_x64.exe
+    <PostBuildEvent>powershell stop-process -name "KSP_x64"; wait-process -name "KSP_x64"
+powershell stop-process -name "UnityCrashHandler64"; wait-process -name "UnityCrashHandler64"
 copy /Y "$(ProjectDir)$(OutDir)Renamer.dll" "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\Test\Renamer.dll"
 copy /Y "$(ProjectDir)$(OutDir)Renamer.cfg" "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\Test\Renamer.cfg"
 powershell start-process "\"C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64.exe\""

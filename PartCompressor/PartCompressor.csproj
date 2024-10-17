@@ -73,6 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\ExtensionMethods.cs" />
+    <Compile Include="Helpers\VesselTemporaryPosition.cs" />
     <Compile Include="Helpers\VesselTemporaryRotation.cs" />
     <Compile Include="OmNomNom.cs" />
     <Compile Include="OmNomNom_Helpers.cs" />
@@ -90,7 +91,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>START /wait taskkill /F /IM KSP_x64.exe
+    <PostBuildEvent>powershell stop-process -name "KSP_x64"; wait-process -name "KSP_x64"
+powershell stop-process -name "UnityCrashHandler64"; wait-process -name "UnityCrashHandler64"
 copy /Y "$(ProjectDir)$(OutDir)PartCompressor.dll" "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\Test\PartCompressor.dll"
 copy /Y "$(ProjectDir)$(OutDir)PartCompressor.cfg" "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\Test\PartCompressor.cfg"
 copy /Y "$(ProjectDir)$(OutDir)PartCompressor_Debug.cfg" "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\Test\PartCompressor_Debug.cfg"
