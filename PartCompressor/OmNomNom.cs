@@ -52,22 +52,22 @@ namespace PartCompressor
 
         const string ConfigNode_OriginalPosition = "__OriginalPosition";
         const string ConfigNode_OriginalRotation = "__OriginalRotation";
+        const string ConfigNode_OriginalPartRotation = "__OriginalPartRotation";
         const string ConfigNode_PartNameTag = "__NameTag";
         private void CompressPart(Part part)
         {
             using (vessel.Protect(true, "__BeforeCompress"))
             using (vessel.TemporarilyPositionAtZero())
             {
+                var vesselNode = new ConfigNode("COMPRESSE_PARTS");
+                vesselNode.SetValue(ConfigNode_OriginalPartRotation, part.orgRot, true);
+
                 part.decouple();
 
                 var newVessel = part.vessel;
 
                 var originalPosition = newVessel.transform.position;
-                //originalPosition += this.vessel.transform.position; //on ground current vessel is not at [0,0,0]!!!
                 var originalRotation = this.vessel.transform.rotation;
-
-                var vesselNode = new ConfigNode("COMPRESSE_PARTS");
-
                 vesselNode.SetValue(ConfigNode_OriginalPosition, originalPosition, true);
                 vesselNode.SetValue(ConfigNode_OriginalRotation, originalRotation, true);
                 vesselNode.SetValue(ConfigNode_PartNameTag, part.partInfo.title, true);
@@ -89,8 +89,9 @@ namespace PartCompressor
         {
             UnityEngine.Vector3 originalPosition = UnityEngine.Vector3.zero;
             UnityEngine.Quaternion originalRotation = new UnityEngine.Quaternion();
+            UnityEngine.Quaternion originalPartRotation = new UnityEngine.Quaternion();
 
-            if (!vesselNode.TryGetValue(ConfigNode_OriginalPosition, ref originalPosition) || !vesselNode.TryGetValue(ConfigNode_OriginalRotation, ref originalRotation)
+            if (!vesselNode.TryGetValue(ConfigNode_OriginalPosition, ref originalPosition) || !vesselNode.TryGetValue(ConfigNode_OriginalRotation, ref originalRotation) || !vesselNode.TryGetValue(ConfigNode_OriginalPartRotation, ref originalPartRotation)
                 )
             {
                 print("Faulty compressed vessel config!!!");
@@ -108,8 +109,9 @@ namespace PartCompressor
                 lastDetached.GoOnRails();
 
                 lastDetached.SetPosition(originalPosition);
-                //required if orbit eccentricity changes since compression
-                lastDetached.SetRotation(originalRotation);
+                //originalRotation is required if orbit eccentricity changes since compression
+                //originalPartRotation is required if originalRotation is applied :)
+                lastDetached.SetRotation(originalRotation * originalPartRotation);
 
                 var detachedMass = lastDetached.GetTotalMass();
 
