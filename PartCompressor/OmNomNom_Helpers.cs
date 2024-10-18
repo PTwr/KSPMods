@@ -7,35 +7,29 @@ namespace PartCompressor
     {
         protected void ChangeFakeMass(double mass)
         {
-
+            print("[OmNomNom.ChangeFakeMass] Searching for existing __CompressedPartsMassEquivalent");
             var res = this.part.Resources.Get("__CompressedPartsMassEquivalent");
 
             if (res is null)
             {
-                print("Creating resource for FakeMass");
-                print($"Setting fake mass to: {mass}");
-                print(-1);
-
-                var resourcDef = PartResourceLibrary.Instance.GetDefinition("__CompressedPartsMassEquivalent");
-                var resourcDef2 = PartResourceLibrary.Instance.GetDefinition("__CompressedPartsMassEquivalent");
-                print(resourcDef == resourcDef2);
+                print("[OmNomNom.ChangeFakeMass] Creating resource for __CompressedPartsMassEquivalent");
+                print($"[OmNomNom.ChangeFakeMass] Setting fake mass to: {mass}");
 
                 this.part.Resources.Add("__CompressedPartsMassEquivalent", mass, mass, false, false, true, true, PartResource.FlowMode.None);
-                print(4);
-
             }
             else
             {
-                print("$Reusing existing resource for FakeMass");
-                print($"Changing fake mass from {res.amount} by {mass} to: {res.amount + mass}");
+                print("[OmNomNom.ChangeFakeMass] Reusing existing resource for __CompressedPartsMassEquivalent");
+                print($"[OmNomNom.ChangeFakeMass] Changing __CompressedPartsMassEquivalent mass from {res.amount} by {mass} to: {res.amount + mass}");
                 mass+=res.amount;
                 this.part.RemoveResource("__CompressedPartsMassEquivalent");
                 res = this.part.Resources.Add("__CompressedPartsMassEquivalent", mass, mass, false, false, true, true, PartResource.FlowMode.None);
-                print($"Updated resource amount: {res.amount}");
+                print($"[OmNomNom.ChangeFakeMass] Updated __CompressedPartsMassEquivalent amount: {res.amount}");
             }
         }
         protected void RemFakeMass()
         {
+            print("[OmNomNom.ChangeFakeMass] Removing __CompressedPartsMassEquivalent");
             this.part.RemoveResource("__CompressedPartsMassEquivalent");
         }
     }

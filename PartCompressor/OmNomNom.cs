@@ -15,7 +15,6 @@ namespace PartCompressor
     {
         const string CompressedSubVesselsConfigNodeName = "CompressedSubVesselsConfigNode";
 
-
         List<ConfigNode> vesselNodes = new List<ConfigNode>();
 
         public override void OnSave(ConfigNode node)
@@ -24,16 +23,19 @@ namespace PartCompressor
             {
                 var config = new ConfigNode(CompressedSubVesselsConfigNodeName);
 
+                print($"[OmNomNom.OnSave] Gathering info of #{vesselNodes.Count} packed part-branches");
                 int n = 0;
                 foreach (var vesselNode in vesselNodes)
                 {
                     config.AddNode($"Compressed Vessel #{n++}", vesselNode);
                 }
 
+                print("[OmNomNom.OnSave] Saving packed part info");
                 node.SetNode(CompressedSubVesselsConfigNodeName, config, true);
             }
             else if (node.HasNode(CompressedSubVesselsConfigNodeName))
             {
+                print("[OmNomNom.OnSave] Cleaning up unnecessary node");
                 node.RemoveNode(CompressedSubVesselsConfigNodeName);
             }
 
@@ -43,6 +45,7 @@ namespace PartCompressor
         {
             if (node.HasNode(CompressedSubVesselsConfigNodeName))
             {
+                print("[OmNomNom.OnLoad] Loading packed part info");
                 var config = node.GetNode(CompressedSubVesselsConfigNodeName);
 
                 vesselNodes = config.GetNodes().ToList();
@@ -60,28 +63,36 @@ namespace PartCompressor
             using (vessel.TemporarilyPositionAtZero())
             {
                 var vesselNode = new ConfigNode("COMPRESSE_PARTS");
+
+                print($"[OmNomNom.CompressPart] Storing part.orgRot of {part.orgRot}");
                 vesselNode.SetValue(ConfigNode_OriginalPartRotation, part.orgRot, true);
 
+                print($"[OmNomNom.CompressPart] Decoupling part branch");
                 part.decouple();
 
                 var newVessel = part.vessel;
 
                 var originalPosition = newVessel.transform.position;
                 var originalRotation = this.vessel.transform.rotation;
+
+                print($"[OmNomNom.CompressPart] Storing part position of {originalPosition}");
                 vesselNode.SetValue(ConfigNode_OriginalPosition, originalPosition, true);
+                print($"[OmNomNom.CompressPart] Storing part rotation of {originalRotation}");
                 vesselNode.SetValue(ConfigNode_OriginalRotation, originalRotation, true);
+                print($"[OmNomNom.CompressPart] Storing part friendly name of {part.partInfo.title}");
                 vesselNode.SetValue(ConfigNode_PartNameTag, part.partInfo.title, true);
 
+                print($"[OmNomNom.CompressPart] BackupVessel()");
                 ProtoVessel pVessel = newVessel.BackupVessel();
                 pVessel.Save(vesselNode);
 
                 vesselNodes.Add(vesselNode);
 
+                print($"[OmNomNom.CompressPart] ChangeFakeMass()");
                 ChangeFakeMass(newVessel.GetTotalMass());
 
+                print($"[OmNomNom.CompressPart] Removing compressed parts from game");
                 newVessel.Die();
-
-                print($"vesselNode name: {vesselNode.name}");
             }
         }
 
@@ -91,10 +102,11 @@ namespace PartCompressor
             UnityEngine.Quaternion originalRotation = new UnityEngine.Quaternion();
             UnityEngine.Quaternion originalPartRotation = new UnityEngine.Quaternion();
 
+            print($"[OmNomNom.DecompressVesselNode] Fetching positional data from config node");
             if (!vesselNode.TryGetValue(ConfigNode_OriginalPosition, ref originalPosition) || !vesselNode.TryGetValue(ConfigNode_OriginalRotation, ref originalRotation) || !vesselNode.TryGetValue(ConfigNode_OriginalPartRotation, ref originalPartRotation)
                 )
             {
-                print("Faulty compressed vessel config!!!");
+                Debug.LogError("[OmNomNom.DecompressVesselNode] Faulty compressed vessel config!");
                 ScreenMessages.PostScreenMessage("Faulty compressed vessel config!!!");
                 return;
             }
@@ -102,23 +114,30 @@ namespace PartCompressor
             using (vessel.TemporarilyRotate(originalRotation))
             using (vessel.TemporarilyPositionAtZero())
             {
+                print("[OmNomNom.DecompressVesselNode] Recreating packed parts as a vessel");
                 ProtoVessel addedVessel = HighLogic.CurrentGame.AddVessel(vesselNode);
-                var lastDetached = addedVessel.vesselRef;
+                var unpackedVessel = addedVessel.vesselRef;
 
-                lastDetached.Load();
-                lastDetached.GoOnRails();
+                print("[OmNomNom.DecompressVesselNode] unpackedVessel.Load()");
+                unpackedVessel.Load();
+                print("[OmNomNom.DecompressVesselNode] unpackedVessel.GoOnRails()");
+                unpackedVessel.GoOnRails();
 
-                lastDetached.SetPosition(originalPosition);
+                print("[OmNomNom.DecompressVesselNode] setting unpacked vessel position");
+                unpackedVessel.SetPosition(originalPosition);
                 //originalRotation is required if orbit eccentricity changes since compression
                 //originalPartRotation is required if originalRotation is applied :)
-                lastDetached.SetRotation(originalRotation * originalPartRotation);
+                print("[OmNomNom.DecompressVesselNode] setting unpacked vessel rotation");
+                unpackedVessel.SetRotation(originalRotation * originalPartRotation);
 
-                var detachedMass = lastDetached.GetTotalMass();
+                var detachedMass = unpackedVessel.GetTotalMass();
 
-                var partsToAttach = lastDetached.Parts.ToList();
+                var partsToAttach = unpackedVessel.Parts.ToList();
 
-                lastDetached.rootPart.Couple(this.part);
+                print("[OmNomNom.DecompressVesselNode] recoupling unpacked vessel to host part");
+                unpackedVessel.rootPart.Couple(this.part);
 
+                print("[OmNomNom.DecompressVesselNode] autostrutting decompressed parts");
                 foreach (var part in partsToAttach)
                 {
                     part.AllowAutoStruts();
@@ -126,6 +145,7 @@ namespace PartCompressor
                     part.UpdateAutoStrut();
                 }
 
+                print("[OmNomNom.DecompressVesselNode] removing fake mass from host part");
                 ChangeFakeMass(-detachedMass);
 
                 vesselNodes.Remove(vesselNode);
@@ -157,14 +177,14 @@ namespace PartCompressor
             }
         }
 
-        [KSPEvent(guiActive = true, guiName = "RequestCompression", active = true, guiActiveEditor = true)]
+        [KSPEvent(guiActive = true, guiName = "RequestCompression", active = true, guiActiveEditor = false)]
         public void RequestCompression()
         {
             compressionRequested = true;
             decompressionRequested = false;
         }
 
-        [KSPEvent(guiActive = true, guiName = "RequestDecompression", active = true, guiActiveEditor = true)]
+        [KSPEvent(guiActive = true, guiName = "RequestDecompression", active = true, guiActiveEditor = false)]
         public void RequestdDecompression()
         {
             compressionRequested = false;

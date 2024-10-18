@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace PartCompressor
 {
@@ -12,11 +13,13 @@ namespace PartCompressor
 
         public VesselProtector(Vessel vessel, bool autosave = true, string autosaveName = "__autosave")
         {
+            Debug.Log("[VesselProtector] Protecting vessel from physics!!!");
             ScreenMessages.PostScreenMessage("Protecting vessel from physics!!!");
             FlightDriver.SetPause(true, true);
 
             if (autosave)
             {
+                Debug.Log("[VesselProtector] autosaving!!!");
                 GamePersistence.SaveGame(HighLogic.CurrentGame,
                     autosaveName,
                     HighLogic.SaveFolder,
@@ -25,13 +28,16 @@ namespace PartCompressor
 
             this.vessel = vessel;
 
+            Debug.Log("[VesselProtector] GoOnRails!!!");
             vessel.GoOnRails();
         }
 
         public void Dispose()
         {
+            Debug.Log("[VesselProtector] GoOffRails!!!");
             vessel.GoOffRails();
 
+            Debug.Log("[VesselProtector] Disabling vessel protection!!!");
             ScreenMessages.PostScreenMessage("Disabling vessel protection!!!");
             FlightDriver.SetPause(false, true);
         }

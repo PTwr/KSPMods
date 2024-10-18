@@ -12,11 +12,14 @@ namespace PartCompressor
         {
             this.vessel = vessel;
 
+            Debug.Log("[VesselTemporaryRotation] Storing original rotation!!!");
             originalRotation = vessel.transform.rotation;
+            Debug.Log("[VesselTemporaryRotation] Setting temporary rotation!!!");
             vessel.SetRotation(rotation);
         }
         public void Dispose()
         {
+            Debug.Log("[VesselTemporaryRotation] Restoring original rotation!!!");
             vessel.SetRotation(originalRotation);
         }
     }

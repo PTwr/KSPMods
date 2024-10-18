@@ -82,9 +82,7 @@
     <Compile Include="Helpers\VesselProtector.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PartCompressor_Debug.cfg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="PartCompressor_Debug.cfg" />
     <None Include="PartCompressor.cfg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -95,7 +93,6 @@
 powershell stop-process -name "UnityCrashHandler64"; wait-process -name "UnityCrashHandler64"
 copy /Y "$(ProjectDir)$(OutDir)PartCompressor.dll" "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\KSPPartCountOptimizers\PartCompressor.dll"
 copy /Y "$(ProjectDir)$(OutDir)PartCompressor.cfg" "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\KSPPartCountOptimizers\PartCompressor.cfg"
-copy /Y "$(ProjectDir)$(OutDir)PartCompressor_Debug.cfg" "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\GameData\KSPPartCountOptimizers\PartCompressor_Debug.cfg"
 powershell start-process "\"C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64.exe\""
 </PostBuildEvent>
   </PropertyGroup>
